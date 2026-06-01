@@ -44,6 +44,15 @@ patches:
                   - { name: SHOPIFY_STORE, value: "ymimst-yh.myshopify.com" }
                   - { name: SHOPIFY_ADMIN_STORE_HANDLE, value: "skirmshop-spain" }
                   - { name: SII_CERTIFICATE_PATH, value: "/app/secrets/sii.p12" }
+                  - name: _SYNAPSE_RMQ_USER
+                    valueFrom:
+                      secretKeyRef: { name: rabbitmq-secrets, key: RABBITMQ_DEFAULT_USER }
+                  - name: SYNAPSE_AMQP_PASSWORD
+                    valueFrom:
+                      secretKeyRef: { name: rabbitmq-secrets, key: RABBITMQ_DEFAULT_PASS }
+                  - { name: SYNAPSE_AMQP_URL, value: "amqp://$(_SYNAPSE_RMQ_USER)@shared-rabbitmq.databases.svc.cluster.local:5672/%2Fsynapse" }
+                  - { name: SYNAPSE_TENANT, value: "skirmshop" }
+                  - { name: SYNAPSE_EMAIL_SENDER, value: "skirmshop" }
                   - name: SII_CERTIFICATE_PASSPHRASE
                     valueFrom:
                       secretKeyRef: { name: sii-certificate, key: passphrase }

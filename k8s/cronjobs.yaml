@@ -1,5 +1,5 @@
 # SII scheduled jobs (migrated off sauvage's `ubuntu` crontab: cron-wrapper.sh sii_*).
-# Pins its OWN image (shopify-sii-app:v1.10.9 — ships scripts/ + app/ + tsx + the metrics
+# Pins its OWN image (shopify-sii-app:v1.10.10 — ships scripts/ + app/ + tsx + the metrics
 # fix) so it is decoupled from the kustomization `images:` rewrite and does NOT touch the
 # sii-app Deployment. envFrom sii-secrets (token + full SII config) + the AEAT cert
 # (sii-certificate mounted at /app/secrets). timeZone keeps the Spanish fiscal local time.
@@ -38,7 +38,7 @@ spec:
               secret: { secretName: sii-certificate }
           containers:
             - name: invoicing
-              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.10.9
+              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.10.10
               imagePullPolicy: IfNotPresent
               workingDir: /app
               command: ["tsx", "scripts/daily-invoicing.ts"]
@@ -57,6 +57,13 @@ spec:
                 - { name: SCOPES, value: "read_orders,read_all_orders,read_products,write_orders,read_customers,write_customers" }
                 - { name: SII_CERTIFICATE_PATH, value: "/app/secrets/sii.p12" }
                 - { name: SII_REPORT_CHANNEL, value: "ops" }
+                - name: _SYNAPSE_RMQ_USER
+                  valueFrom: { secretKeyRef: { name: rabbitmq-secrets, key: RABBITMQ_DEFAULT_USER } }
+                - name: SYNAPSE_AMQP_PASSWORD
+                  valueFrom: { secretKeyRef: { name: rabbitmq-secrets, key: RABBITMQ_DEFAULT_PASS } }
+                - { name: SYNAPSE_AMQP_URL, value: "amqp://$(_SYNAPSE_RMQ_USER)@shared-rabbitmq.databases.svc.cluster.local:5672/%2Fsynapse" }
+                - { name: SYNAPSE_TENANT, value: "skirmshop" }
+                - { name: SYNAPSE_EMAIL_SENDER, value: "skirmshop" }
                 - name: SII_CERTIFICATE_PASSPHRASE
                   valueFrom: { secretKeyRef: { name: sii-certificate, key: passphrase } }
               volumeMounts:
@@ -99,7 +106,7 @@ spec:
               secret: { secretName: sii-certificate }
           containers:
             - name: monthly-report
-              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.10.9
+              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.10.10
               imagePullPolicy: IfNotPresent
               workingDir: /app
               command: ["tsx", "scripts/monthly-fiscal-report.ts"]
@@ -117,6 +124,13 @@ spec:
                 - { name: SHOPIFY_ADMIN_STORE_HANDLE, value: "skirmshop-spain" }
                 - { name: SCOPES, value: "read_orders,read_all_orders,read_products,write_orders,read_customers,write_customers" }
                 - { name: SII_CERTIFICATE_PATH, value: "/app/secrets/sii.p12" }
+                - name: _SYNAPSE_RMQ_USER
+                  valueFrom: { secretKeyRef: { name: rabbitmq-secrets, key: RABBITMQ_DEFAULT_USER } }
+                - name: SYNAPSE_AMQP_PASSWORD
+                  valueFrom: { secretKeyRef: { name: rabbitmq-secrets, key: RABBITMQ_DEFAULT_PASS } }
+                - { name: SYNAPSE_AMQP_URL, value: "amqp://$(_SYNAPSE_RMQ_USER)@shared-rabbitmq.databases.svc.cluster.local:5672/%2Fsynapse" }
+                - { name: SYNAPSE_TENANT, value: "skirmshop" }
+                - { name: SYNAPSE_EMAIL_SENDER, value: "skirmshop" }
                 - name: SII_CERTIFICATE_PASSPHRASE
                   valueFrom: { secretKeyRef: { name: sii-certificate, key: passphrase } }
               volumeMounts:
