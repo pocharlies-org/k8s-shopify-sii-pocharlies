@@ -17,7 +17,7 @@ labels:
 images:
   - name: shopify-app
     newName: harbor.lan.e-dani.com/homelab/shopify-sii-app
-    newTag: v1.10.7
+    newTag: v1.10.16
 
 patches:
   - target: { kind: Deployment, name: app }
@@ -44,6 +44,23 @@ patches:
                   - { name: SHOPIFY_STORE, value: "ymimst-yh.myshopify.com" }
                   - { name: SHOPIFY_ADMIN_STORE_HANDLE, value: "skirmshop-spain" }
                   - { name: SII_CERTIFICATE_PATH, value: "/app/secrets/sii.p12" }
+                  - name: _SYNAPSE_RMQ_USER
+                    valueFrom:
+                      secretKeyRef: { name: rabbitmq-secrets, key: RABBITMQ_DEFAULT_USER }
+                  - name: SYNAPSE_AMQP_PASSWORD
+                    valueFrom:
+                      secretKeyRef: { name: rabbitmq-secrets, key: RABBITMQ_DEFAULT_PASS }
+                  - { name: SYNAPSE_AMQP_URL, value: "amqp://$(_SYNAPSE_RMQ_USER)@shared-rabbitmq.databases.svc.cluster.local:5672/%2Fsynapse" }
+                  - { name: SYNAPSE_TENANT, value: "skirmshop" }
+                  - { name: SYNAPSE_EMAIL_SENDER, value: "skirmshop" }
+                  - { name: S3_ENDPOINT, value: "http://skirmshop-drive-s3.backup-hub.svc.cluster.local:9000" }
+                  - { name: S3_BUCKET, value: "skirmshop-drive" }
+                  - { name: S3_REGION, value: "us-east-1" }
+                  - { name: S3_PREFIX, value: "invoices/sii" }
+                  - name: AWS_ACCESS_KEY_ID
+                    valueFrom: { secretKeyRef: { name: skirmshop-drive-s3-app, key: AWS_ACCESS_KEY_ID } }
+                  - name: AWS_SECRET_ACCESS_KEY
+                    valueFrom: { secretKeyRef: { name: skirmshop-drive-s3-app, key: AWS_SECRET_ACCESS_KEY } }
                   - name: SII_CERTIFICATE_PASSPHRASE
                     valueFrom:
                       secretKeyRef: { name: sii-certificate, key: passphrase }
