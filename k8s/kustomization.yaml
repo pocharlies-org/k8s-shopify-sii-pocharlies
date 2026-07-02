@@ -17,7 +17,7 @@ labels:
 images:
   - name: shopify-app
     newName: harbor.lan.e-dani.com/homelab/shopify-sii-app
-    newTag: v1.13.6
+    newTag: v1.13.7
 
 patches:
   - target: { kind: Deployment, name: app }
