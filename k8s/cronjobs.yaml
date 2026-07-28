@@ -13,7 +13,7 @@ metadata:
 spec:
   schedule: "0 1 * * *"          # was: sii_invoicing — daily 01:00
   timeZone: Europe/Madrid
-  suspend: false                 # ACTIVE — sauvage host cron line removed at cutover 2026-05-24
+  suspend: true                  # Temporary VIES gate rollout hold; daily 2026-07-29 run completed first
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 200
   successfulJobsHistoryLimit: 3
@@ -96,7 +96,7 @@ metadata:
 spec:
   schedule: "10 1 1 * *"         # was: sii_monthly_report — monthly, day 1 @ 01:10
   timeZone: Europe/Madrid
-  suspend: false                 # ACTIVE — sauvage host cron line removed at cutover 2026-05-24
+  suspend: true                  # Temporary VIES gate rollout hold
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 200
   successfulJobsHistoryLimit: 3
