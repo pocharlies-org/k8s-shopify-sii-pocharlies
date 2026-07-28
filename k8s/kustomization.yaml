@@ -6,6 +6,7 @@ namespace: skirmshop
 resources:
   - https://github.com/pocharlies/k8s-shopify-framework-pocharlies.git//base?ref=deploy/prod
   - cronjobs.yaml
+  - vies-gate-migration.yaml
 
 namePrefix: sii-
 
@@ -17,7 +18,8 @@ labels:
 images:
   - name: shopify-app
     newName: harbor.lan.e-dani.com/homelab/shopify-sii-app
-    newTag: v1.13.12
+    newTag: v1.14.0
+    digest: sha256:76a7dcabeed6ad693cfcf7406bba0ad0d1f88426d5eb6b12cdeb08332e0ed85a
 
 patches:
   - target: { kind: Deployment, name: app }
@@ -27,6 +29,13 @@ patches:
       metadata:
         name: app
       spec:
+        minReadySeconds: 10
+        progressDeadlineSeconds: 600
+        strategy:
+          type: RollingUpdate
+          rollingUpdate:
+            maxUnavailable: 0
+            maxSurge: 1
         template:
           spec:
             # Mount the AEAT client certificate (same source as the cronjobs):
