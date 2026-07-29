@@ -24,7 +24,7 @@ spec:
         - { key: role, operator: Equal, value: edge, effect: NoSchedule }
       containers:
         - name: migrate
-          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.0@sha256:76a7dcabeed6ad693cfcf7406bba0ad0d1f88426d5eb6b12cdeb08332e0ed85a
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.1@sha256:ff53fdfba31a8400f32774bd6150cdea987f3a31810c44f09cb053adb7783319
           imagePullPolicy: IfNotPresent
           workingDir: /app
           command: ["tsx", "scripts/apply-vies-gate-migration.ts"]
@@ -67,7 +67,7 @@ spec:
         - { key: role, operator: Equal, value: edge, effect: NoSchedule }
       containers:
         - name: verify
-          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.0@sha256:76a7dcabeed6ad693cfcf7406bba0ad0d1f88426d5eb6b12cdeb08332e0ed85a
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.1@sha256:ff53fdfba31a8400f32774bd6150cdea987f3a31810c44f09cb053adb7783319
           imagePullPolicy: IfNotPresent
           workingDir: /app
           command:
