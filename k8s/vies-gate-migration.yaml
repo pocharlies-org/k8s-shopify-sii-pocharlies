@@ -1,0 +1,88 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vies-gate-migration
+  labels:
+    app.kubernetes.io/component: database-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: harbor-pull
+      nodeSelector:
+        role: edge
+        kubernetes.io/arch: amd64
+      tolerations:
+        - { key: role, operator: Equal, value: edge, effect: NoSchedule }
+      containers:
+        - name: migrate
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.0@sha256:76a7dcabeed6ad693cfcf7406bba0ad0d1f88426d5eb6b12cdeb08332e0ed85a
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command: ["tsx", "scripts/apply-vies-gate-migration.ts"]
+          env:
+            - { name: NODE_ENV, value: "production" }
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-app, key: username }
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-app, key: password }
+            - { name: DATABASE_URL, value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postgres-shared-rw.databases.svc.cluster.local:5432/skirmshop?connection_limit=2&pool_timeout=15&connect_timeout=10&application_name=sii-vies-migration" }
+          resources:
+            requests: { cpu: 25m, memory: 128Mi }
+            limits: { memory: 384Mi }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vies-gate-migration-verify
+  labels:
+    app.kubernetes.io/component: database-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: harbor-pull
+      nodeSelector:
+        role: edge
+        kubernetes.io/arch: amd64
+      tolerations:
+        - { key: role, operator: Equal, value: edge, effect: NoSchedule }
+      containers:
+        - name: verify
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.0@sha256:76a7dcabeed6ad693cfcf7406bba0ad0d1f88426d5eb6b12cdeb08332e0ed85a
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command:
+            - tsx
+            - scripts/apply-vies-gate-migration.ts
+            - --verify-only
+          env:
+            - { name: NODE_ENV, value: "production" }
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-app, key: username }
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-app, key: password }
+            - { name: DATABASE_URL, value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postgres-shared-rw.databases.svc.cluster.local:5432/skirmshop?connection_limit=2&pool_timeout=15&connect_timeout=10&application_name=sii-vies-migration-verify" }
+          resources:
+            requests: { cpu: 25m, memory: 128Mi }
+            limits: { memory: 384Mi }
