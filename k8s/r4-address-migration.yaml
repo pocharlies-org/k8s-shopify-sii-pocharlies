@@ -1,0 +1,118 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: r4-address-migration
+  labels:
+    app.kubernetes.io/component: database-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: harbor-pull
+      nodeSelector:
+        role: edge
+        kubernetes.io/arch: amd64
+      tolerations:
+        - { key: role, operator: Equal, value: edge, effect: NoSchedule }
+      containers:
+        - name: migrate
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.4@sha256:5b23836e70de728cf1f6c52a339534d15a77c6dacef741f7263d900f4ee9ac02
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command:
+            - npx
+            - prisma
+            - db
+            - execute
+            - --schema
+            - prisma/schema.prisma
+            - --file
+            - prisma/migrations/20260803220000_add_r4_address_rectification/migration.sql
+          env:
+            - { name: NODE_ENV, value: "production" }
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-app, key: username }
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-app, key: password }
+            - { name: DATABASE_URL, value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postgres-shared-rw.databases.svc.cluster.local:5432/skirmshop?connection_limit=2&pool_timeout=15&connect_timeout=10&application_name=sii-r4-address-migration" }
+          resources:
+            requests: { cpu: 25m, memory: 128Mi }
+            limits: { memory: 384Mi }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: r4-address-migration-verify
+  labels:
+    app.kubernetes.io/component: database-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: harbor-pull
+      nodeSelector:
+        role: edge
+        kubernetes.io/arch: amd64
+      tolerations:
+        - { key: role, operator: Equal, value: edge, effect: NoSchedule }
+      containers:
+        - name: verify
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.4@sha256:5b23836e70de728cf1f6c52a339534d15a77c6dacef741f7263d900f4ee9ac02
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command: ["node", "--input-type=module", "-e"]
+          args:
+            - |-
+              import { PrismaClient } from "@prisma/client";
+              const db = new PrismaClient();
+              try {
+                const columns = await db.$queryRawUnsafe(`
+                  SELECT column_name
+                  FROM information_schema.columns
+                  WHERE table_schema = 'public'
+                    AND table_name = 'SiiSubmission'
+                    AND column_name IN ('counterpartyAddress', 'rectificationReason', 'idempotencyKey')
+                `);
+                const names = new Set(columns.map((row) => row.column_name));
+                const missing = ['counterpartyAddress', 'rectificationReason', 'idempotencyKey']
+                  .filter((name) => !names.has(name));
+                const indexes = await db.$queryRawUnsafe(`
+                  SELECT to_regclass('"SiiSubmission_idempotencyKey_key"')::text AS index_name
+                `);
+                if (missing.length || !indexes[0]?.index_name) {
+                  throw new Error(`R4 migration incomplete; missing columns=${missing.join(',') || 'none'} index=${indexes[0]?.index_name || 'missing'}`);
+                }
+                console.log(JSON.stringify({ ok: true, migration: 'sii-r4-address-v1' }));
+              } finally {
+                await db.$disconnect();
+              }
+          env:
+            - { name: NODE_ENV, value: "production" }
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-app, key: username }
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-app, key: password }
+            - { name: DATABASE_URL, value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postgres-shared-rw.databases.svc.cluster.local:5432/skirmshop?connection_limit=2&pool_timeout=15&connect_timeout=10&application_name=sii-r4-address-migration-verify" }
+          resources:
+            requests: { cpu: 25m, memory: 128Mi }
+            limits: { memory: 384Mi }

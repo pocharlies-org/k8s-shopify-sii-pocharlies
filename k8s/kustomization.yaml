@@ -7,6 +7,7 @@ resources:
   - https://github.com/pocharlies/k8s-shopify-framework-pocharlies.git//base?ref=deploy/prod
   - cronjobs.yaml
   - vies-gate-migration.yaml
+  - r4-address-migration.yaml
 
 namePrefix: sii-
 
@@ -18,8 +19,8 @@ labels:
 images:
   - name: shopify-app
     newName: harbor.lan.e-dani.com/homelab/shopify-sii-app
-    newTag: v1.14.1
-    digest: sha256:ff53fdfba31a8400f32774bd6150cdea987f3a31810c44f09cb053adb7783319
+    newTag: v1.14.4
+    digest: sha256:5b23836e70de728cf1f6c52a339534d15a77c6dacef741f7263d900f4ee9ac02
 
 patches:
   - target: { kind: Deployment, name: app }
