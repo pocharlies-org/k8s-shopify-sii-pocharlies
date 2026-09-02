@@ -24,7 +24,7 @@ spec:
         - { key: role, operator: Equal, value: edge, effect: NoSchedule }
       containers:
         - name: migrate
-          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.4@sha256:5b23836e70de728cf1f6c52a339534d15a77c6dacef741f7263d900f4ee9ac02
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.5@sha256:6699a4de64e3228920ab7bd34202ee403f1aeae931a76c1fc14b6ee213cabb01
           imagePullPolicy: IfNotPresent
           workingDir: /app
           command:
@@ -75,7 +75,7 @@ spec:
         - { key: role, operator: Equal, value: edge, effect: NoSchedule }
       containers:
         - name: verify
-          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.4@sha256:5b23836e70de728cf1f6c52a339534d15a77c6dacef741f7263d900f4ee9ac02
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.5@sha256:6699a4de64e3228920ab7bd34202ee403f1aeae931a76c1fc14b6ee213cabb01
           imagePullPolicy: IfNotPresent
           workingDir: /app
           command: ["node", "--input-type=module", "-e"]
