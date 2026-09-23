@@ -3,11 +3,13 @@ name: CI
 # Re-registered 2026-05-26 after org rename pocharlies → pocharlies-org left
 # push-event triggers in a stale state. Trivial edit forces GitHub to re-parse
 # the workflow definition.
+# Un solo run por PR: el push de ramas duplicaba el de pull_request (la
+# concurrencia agrupa por github.ref, distinto en ambos eventos, y no se
+# cancelaban). push queda solo para el tronco.
 on:
   pull_request:
-    branches: ["**"]
   push:
-    branches: ["**"]
+    branches: [main]
     tags-ignore: ["**"]
 
 concurrency:
