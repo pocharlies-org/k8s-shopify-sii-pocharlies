@@ -129,6 +129,10 @@ spec:
                 - secretRef: { name: sii-secrets }
               env:
                 - { name: NODE_ENV, value: "production" }
+                # SKIRM-72: el Secret sii-secrets aún lleva el topic viejo (18204, borrado — de ahí el
+                # "message thread not found" de agosto). El topic actual «SII Reportes» es 1123.
+                # env explícita: gana sobre envFrom sin tocar el Secret.
+                - { name: SII_REPORT_TELEGRAM_THREAD_ID, value: "1123" }
                 - name: DB_USER
                   valueFrom: { secretKeyRef: { name: shared-postgres-app, key: username } }
                 - name: DB_PASSWORD

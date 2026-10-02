@@ -8,6 +8,7 @@ resources:
   - cronjobs.yaml
   - vies-gate-migration.yaml
   - r4-address-migration.yaml
+  - externalsecret-telegram.yaml
 
 namePrefix: sii-
 
