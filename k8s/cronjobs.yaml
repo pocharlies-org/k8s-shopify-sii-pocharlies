@@ -129,10 +129,11 @@ spec:
                 - secretRef: { name: sii-secrets }
               env:
                 - { name: NODE_ENV, value: "production" }
-                # SKIRM-72: el Secret sii-secrets aún lleva el topic viejo (18204, borrado — de ahí el
-                # "message thread not found" de agosto). El topic actual «SII Reportes» es 1123.
-                # env explícita: gana sobre envFrom sin tocar el Secret.
-                - { name: SII_REPORT_TELEGRAM_THREAD_ID, value: "1123" }
+                # SKIRM-72: el topic «SII Reportes» se borró de Telegram (1123 da
+                # TOPIC_ID_INVALID, medido 02-10). Recreado por el bot (admin,
+                # can_manage_topics): el id actual es 36236. Env explícita: gana
+                # sobre envFrom sin tocar el Secret.
+                - { name: SII_REPORT_TELEGRAM_THREAD_ID, value: "36236" }
                 # SKIRM-72: el token ya no vive en sii-secrets (vació por el bug de
                 # merge; restaurado sin él) — lo sirve el ExternalSecret sii-telegram.
                 - name: SII_REPORT_TELEGRAM_BOT_TOKEN
