@@ -133,6 +133,10 @@ spec:
                 # "message thread not found" de agosto). El topic actual «SII Reportes» es 1123.
                 # env explícita: gana sobre envFrom sin tocar el Secret.
                 - { name: SII_REPORT_TELEGRAM_THREAD_ID, value: "1123" }
+                # SKIRM-72: el token ya no vive en sii-secrets (vació por el bug de
+                # merge; restaurado sin él) — lo sirve el ExternalSecret sii-telegram.
+                - name: SII_REPORT_TELEGRAM_BOT_TOKEN
+                  valueFrom: { secretKeyRef: { name: sii-telegram, key: SII_REPORT_TELEGRAM_BOT_TOKEN } }
                 - name: DB_USER
                   valueFrom: { secretKeyRef: { name: shared-postgres-app, key: username } }
                 - name: DB_PASSWORD
