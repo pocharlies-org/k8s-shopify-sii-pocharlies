@@ -1,5 +1,5 @@
 # SII scheduled jobs (migrated off sauvage's `ubuntu` crontab: cron-wrapper.sh sii_*).
-# Pins its OWN image (shopify-sii-app:v1.14.8 — ships scripts/ + app/ + tsx + the metrics
+# Pins its OWN image (shopify-sii-app:v1.14.9 — ships scripts/ + app/ + tsx + the metrics
 # fix) so it is decoupled from the kustomization `images:` rewrite and does NOT touch the
 # sii-app Deployment. envFrom sii-secrets (token + full SII config) + the AEAT cert
 # (sii-certificate mounted at /app/secrets). timeZone keeps the Spanish fiscal local time.
@@ -38,7 +38,7 @@ spec:
               secret: { secretName: sii-certificate }
           containers:
             - name: invoicing
-              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.8@sha256:2835b9618709fea8ca6d796fbdf0db4c1b90cddef7a5f7cce8a4a66eaed645a8
+              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.9@sha256:8c88386d3ac91b960b412c55fc1555baaf437d4a26fabb47e986208d25aa131c
               imagePullPolicy: IfNotPresent
               workingDir: /app
               command: ["tsx", "scripts/daily-invoicing.ts"]
@@ -121,7 +121,7 @@ spec:
               secret: { secretName: sii-certificate }
           containers:
             - name: monthly-report
-              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.8@sha256:2835b9618709fea8ca6d796fbdf0db4c1b90cddef7a5f7cce8a4a66eaed645a8
+              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.14.9@sha256:8c88386d3ac91b960b412c55fc1555baaf437d4a26fabb47e986208d25aa131c
               imagePullPolicy: IfNotPresent
               workingDir: /app
               command: ["tsx", "scripts/monthly-fiscal-report.ts"]
