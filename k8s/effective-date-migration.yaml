@@ -12,7 +12,8 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 300
+  # 900: sauvage (OVH) baja la imagen de harbor.lan en ~4 min; con 300 no llegaba a correr (14-10).
+  activeDeadlineSeconds: 900
   ttlSecondsAfterFinished: 86400
   template:
     spec:
