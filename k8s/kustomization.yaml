@@ -8,6 +8,7 @@ resources:
   - cronjobs.yaml
   - vies-gate-migration.yaml
   - r4-address-migration.yaml
+  - effective-date-migration.yaml
   - externalsecret-telegram.yaml
 
 namePrefix: sii-
@@ -20,8 +21,8 @@ labels:
 images:
   - name: shopify-app
     newName: harbor.lan.e-dani.com/homelab/shopify-sii-app
-    newTag: v1.14.9
-    digest: sha256:8c88386d3ac91b960b412c55fc1555baaf437d4a26fabb47e986208d25aa131c
+    newTag: v1.15.0
+    digest: sha256:561f7e98eb8115c008a3c1db0c7b8990b40174b3667c1ad76a92875c1490762b
 
 patches:
   - target: { kind: Deployment, name: app }
