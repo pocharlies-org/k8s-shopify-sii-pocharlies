@@ -10,6 +10,7 @@ resources:
   - r4-address-migration.yaml
   - effective-date-migration.yaml
   - externalsecret-telegram.yaml
+  - externalsecret-sii-secrets.yaml
 
 namePrefix: sii-
 
