@@ -13,7 +13,10 @@ metadata:
 spec:
   schedule: "0 1 * * *"          # was: sii_invoicing — daily 01:00
   timeZone: Europe/Madrid
-  suspend: false                 # Active after verified v1.14.1 VIES rollout (2026-07-29)
+  # Suspendida el 29-10-2026: retryOutstandingSubmissions manda a AEAT todo `pending`
+  # con fecha anterior a hoy, y hay dos F1 de Nutrileiria pendientes de que Dani las
+  # revise. Volver a `false` en cuanto estén revisadas (se declaran esa misma noche).
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 200
   successfulJobsHistoryLimit: 3
