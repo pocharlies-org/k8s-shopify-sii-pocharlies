@@ -9,6 +9,7 @@ resources:
   - vies-gate-migration.yaml
   - r4-address-migration.yaml
   - effective-date-migration.yaml
+  - oss-country-daily-ownership.yaml
   - multi-tenant-shop-migration.yaml
   - externalsecret-telegram.yaml
   - externalsecret-sii-secrets.yaml
