@@ -48,8 +48,11 @@ spec:
             - -c
             # to_regclass con el nombre comillado dentro del literal: "OssCountryDaily" lleva
             # mayusculas y plegaria a minusculas sin comillas (el bug que arreglaba v1.16.12).
+            # Dollar-quote CON NOMBRE: Kubernetes expande command/args y la secuencia `$$` se
+            # colapsa a un `$` literal; con `$$` psql recibia "DO $" y fallaba al instante con
+            # syntax error at or near dollar (SC-1799, nota-sre-ownership-sii.md).
             - |
-              DO $$
+              DO $mig$
               DECLARE
                 v_owner text;
               BEGIN
@@ -65,7 +68,7 @@ spec:
                   RAISE NOTICE 'public."OssCountryDaily": propietario cambiado de % a skirmshop', v_owner;
                 END IF;
               END
-              $$;
+              $mig$;
           resources:
             requests: { cpu: 10m, memory: 32Mi }
             limits: { memory: 128Mi }
