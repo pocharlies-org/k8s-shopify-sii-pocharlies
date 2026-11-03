@@ -1,0 +1,71 @@
+# SC-1799: propiedad de la tabla "OssCountryDaily" (base compartida `skirmshop`).
+# La tabla la creo el rol `postgres` y la migracion multi-tenant (wave -2) corre con el rol de
+# app `skirmshop`: falla con SQLSTATE 42501 en su primer ALTER sobre ella (medido en el sync
+# de v1.16.11). Este Job pasa la propiedad a `skirmshop` ANTES de la migracion y nada mas:
+# nunca un DROP, nunca un GRANT, nunca toca filas.
+# Idempotente: consulta primero el propietario actual; si ya es `skirmshop`, sale 0 sin tocar
+# nada. Si la tabla no existe, falla: la migracion tambien la necesita (su ALTER daria 42P01),
+# y aquí el mensaje es mas claro que esperar al fallo del Job de migracion.
+# Patron de Job con psql: imagen ghcr.io/cloudnative-pg/postgresql:17.5 y credenciales del
+# superusuario CNPG, igual que k8s-infra-pocharlies/databases/postgres-shared/role-settings.yaml.
+# El secret ya existe en el namespace (shared-postgres-superuser, rol `postgres`); no se crea aqui.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: oss-country-daily-ownership
+  labels:
+    app.kubernetes.io/component: database-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "-3"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 900
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: ownership
+          image: ghcr.io/cloudnative-pg/postgresql:17.5
+          env:
+            - { name: PGHOST, value: postgres-shared-rw.databases.svc.cluster.local }
+            - { name: PGPORT, value: "5432" }
+            - { name: PGDATABASE, value: skirmshop }
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-superuser, key: username }
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef: { name: shared-postgres-superuser, key: password }
+          command:
+            - psql
+            - -v
+            - ON_ERROR_STOP=1
+            - -c
+            # to_regclass con el nombre comillado dentro del literal: "OssCountryDaily" lleva
+            # mayusculas y plegaria a minusculas sin comillas (el bug que arreglaba v1.16.12).
+            - |
+              DO $$
+              DECLARE
+                v_owner text;
+              BEGIN
+                SELECT pg_catalog.pg_get_userbyid(relowner) INTO v_owner
+                  FROM pg_catalog.pg_class
+                 WHERE oid = to_regclass('public."OssCountryDaily"');
+                IF v_owner IS NULL THEN
+                  RAISE EXCEPTION 'public."OssCountryDaily" no existe; la migracion multi-tenant la necesita';
+                ELSIF v_owner = 'skirmshop' THEN
+                  RAISE NOTICE 'public."OssCountryDaily" ya es de skirmshop: nada que hacer';
+                ELSE
+                  ALTER TABLE public."OssCountryDaily" OWNER TO skirmshop;
+                  RAISE NOTICE 'public."OssCountryDaily": propietario cambiado de % a skirmshop', v_owner;
+                END IF;
+              END
+              $$;
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits: { memory: 128Mi }
