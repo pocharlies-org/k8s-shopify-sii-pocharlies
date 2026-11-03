@@ -9,6 +9,7 @@ resources:
   - vies-gate-migration.yaml
   - r4-address-migration.yaml
   - effective-date-migration.yaml
+  - multi-tenant-shop-migration.yaml
   - externalsecret-telegram.yaml
   - externalsecret-sii-secrets.yaml
 
@@ -22,8 +23,8 @@ labels:
 images:
   - name: shopify-app
     newName: harbor.lan.e-dani.com/homelab/shopify-sii-app
-    newTag: v1.16.9
-    digest: sha256:0717e2fb3a6b8f4c2fe2368917ec74f0ce4379745f6b1f9471f1ff5e7ea18ef6
+    newTag: v1.16.11
+    digest: sha256:f4febaa2f502617849aab8a42010725e6f87c7413f22be94f592f6fde2f07478
 
 patches:
   - target: { kind: Deployment, name: app }
