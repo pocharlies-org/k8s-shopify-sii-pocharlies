@@ -61,7 +61,7 @@ spec:
                 - { name: SHOPIFY_APP_URL, value: "https://skirmshop.e-dani.com/sii" }
                 - { name: SHOPIFY_STORE, value: "ymimst-yh.myshopify.com" }
                 - { name: SHOPIFY_ADMIN_STORE_HANDLE, value: "skirmshop-spain" }
-                - { name: SCOPES, value: "read_orders,read_all_orders,read_products,write_orders,read_customers,write_customers" }
+                - { name: SCOPES, value: "read_orders,read_all_orders,write_orders,read_customers,write_customers" }
                 - { name: SII_CERTIFICATE_PATH, value: "/app/secrets/sii.p12" }
                 - { name: SII_REPORT_CHANNEL, value: "ops" }
                 - { name: S3_ENDPOINT, value: "http://skirmshop-drive-s3.backup-hub.svc.cluster.local:9000" }
@@ -153,7 +153,7 @@ spec:
                 - { name: SHOPIFY_APP_URL, value: "https://skirmshop.e-dani.com/sii" }
                 - { name: SHOPIFY_STORE, value: "ymimst-yh.myshopify.com" }
                 - { name: SHOPIFY_ADMIN_STORE_HANDLE, value: "skirmshop-spain" }
-                - { name: SCOPES, value: "read_orders,read_all_orders,read_products,write_orders,read_customers,write_customers" }
+                - { name: SCOPES, value: "read_orders,read_all_orders,write_orders,read_customers,write_customers" }
                 - { name: SII_CERTIFICATE_PATH, value: "/app/secrets/sii.p12" }
                 - { name: S3_ENDPOINT, value: "http://skirmshop-drive-s3.backup-hub.svc.cluster.local:9000" }
                 - { name: S3_BUCKET, value: "skirmshop-drive" }
