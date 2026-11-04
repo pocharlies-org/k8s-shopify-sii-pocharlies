@@ -4,7 +4,7 @@
 # ninguna de las 5 migraciones de la imagen, y deploy intentaria aplicarlas todas (toca filas
 # de otras apps). El script es idempotente y no escribe en _prisma_migrations: la constancia es
 # el propio estado del esquema (igual que el patrón de vies-gate-migration.yaml).
-# Imagen fijada por digest a v1.16.14 (los commits que publican scripts/apply-multi-tenant-shop-migration.ts:
+# Imagen fijada por digest a v1.16.15 (los commits que publican scripts/apply-multi-tenant-shop-migration.ts:
 # el script con la inspeccion de indices comillada; v1.16.11 fallaba su propia verificacion y hacia rollback).
 apiVersion: batch/v1
 kind: Job
@@ -32,7 +32,7 @@ spec:
         - { key: role, operator: Equal, value: edge, effect: NoSchedule }
       containers:
         - name: migrate
-          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.14@sha256:9493eecf78f0f95d87683467f052da7c20b6de47094818aaf6736ddfee15ec31
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.15@sha256:a4e6c8e6334f645ff831de3a192c7ba22b581b267ef035e62e293aae889f3809
           imagePullPolicy: IfNotPresent
           workingDir: /app
           command: ["tsx", "scripts/apply-multi-tenant-shop-migration.ts"]
@@ -75,7 +75,7 @@ spec:
         - { key: role, operator: Equal, value: edge, effect: NoSchedule }
       containers:
         - name: verify
-          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.14@sha256:9493eecf78f0f95d87683467f052da7c20b6de47094818aaf6736ddfee15ec31
+          image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.15@sha256:a4e6c8e6334f645ff831de3a192c7ba22b581b267ef035e62e293aae889f3809
           imagePullPolicy: IfNotPresent
           workingDir: /app
           command:
