@@ -24,8 +24,8 @@ labels:
 images:
   - name: shopify-app
     newName: harbor.lan.e-dani.com/homelab/shopify-sii-app
-    newTag: v1.16.18
-    digest: sha256:11011399424c76735ee02a9f8517ae5502f530b82e15c985d36ed73fdd4bf002
+    newTag: v1.16.19
+    digest: sha256:e4dae70f434eb0f8cc996fae6c97ada7ef6a61f084783193ef437bde34095bd6
 
 patches:
   - target: { kind: Deployment, name: app }
