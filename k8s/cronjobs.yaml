@@ -38,7 +38,7 @@ spec:
               secret: { secretName: sii-certificate }
           containers:
             - name: invoicing
-              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.19@sha256:e4dae70f434eb0f8cc996fae6c97ada7ef6a61f084783193ef437bde34095bd6
+              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.20@sha256:364c60d6706594b7a327e4b9d00d076fb4c73147911890baf0392f16c093e178
               imagePullPolicy: IfNotPresent
               workingDir: /app
               command: ["tsx", "scripts/daily-invoicing.ts"]
@@ -121,7 +121,7 @@ spec:
               secret: { secretName: sii-certificate }
           containers:
             - name: monthly-report
-              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.19@sha256:e4dae70f434eb0f8cc996fae6c97ada7ef6a61f084783193ef437bde34095bd6
+              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.20@sha256:364c60d6706594b7a327e4b9d00d076fb4c73147911890baf0392f16c093e178
               imagePullPolicy: IfNotPresent
               workingDir: /app
               command: ["tsx", "scripts/monthly-fiscal-report.ts"]
@@ -129,11 +129,11 @@ spec:
                 - secretRef: { name: sii-secrets }
               env:
                 - { name: NODE_ENV, value: "production" }
-                # SKIRM-72: el topic «SII Reportes» se borró de Telegram (1123 da
-                # TOPIC_ID_INVALID, medido 02-10). Recreado por el bot (admin,
-                # can_manage_topics): el id actual es 36236. Env explícita: gana
-                # sobre envFrom sin tocar el Secret.
-                - { name: SII_REPORT_TELEGRAM_THREAD_ID, value: "36236" }
+                # SKIRM-72 / SC-1501: los topics «SII Reportes» se borran solos de
+                # Telegram (1123 → 36236 → ambos "message thread not found", medido
+                # 08-11). Recreado de nuevo por el bot (admin, can_manage_topics):
+                # id actual 38529. Env explícita: gana sobre envFrom sin tocar el Secret.
+                - { name: SII_REPORT_TELEGRAM_THREAD_ID, value: "38529" }
                 # SKIRM-72: el token ya no vive en sii-secrets (vació por el bug de
                 # merge; restaurado sin él) — lo sirve el ExternalSecret sii-telegram.
                 - name: SII_REPORT_TELEGRAM_BOT_TOKEN
