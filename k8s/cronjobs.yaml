@@ -38,7 +38,7 @@ spec:
               secret: { secretName: sii-certificate }
           containers:
             - name: invoicing
-              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.21@sha256:f0c91040254dc17fa4c065881615978c1a559a3154ae9f6dd61b6064ade1f9e5
+              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.22@sha256:b6916cc3cc8a107839fbd4181c3fb8ba4fa4e8285005191cbe9072ec96f77d56
               imagePullPolicy: IfNotPresent
               workingDir: /app
               command: ["tsx", "scripts/daily-invoicing.ts"]
@@ -121,7 +121,7 @@ spec:
               secret: { secretName: sii-certificate }
           containers:
             - name: monthly-report
-              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.21@sha256:f0c91040254dc17fa4c065881615978c1a559a3154ae9f6dd61b6064ade1f9e5
+              image: harbor.lan.e-dani.com/homelab/shopify-sii-app:v1.16.22@sha256:b6916cc3cc8a107839fbd4181c3fb8ba4fa4e8285005191cbe9072ec96f77d56
               imagePullPolicy: IfNotPresent
               workingDir: /app
               command: ["tsx", "scripts/monthly-fiscal-report.ts"]
