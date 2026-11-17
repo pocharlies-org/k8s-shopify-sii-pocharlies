@@ -68,14 +68,11 @@ patches:
                   - { name: SYNAPSE_AMQP_URL, value: "amqp://$(_SYNAPSE_RMQ_USER)@shared-rabbitmq.databases.svc.cluster.local:5672/%2Fsynapse" }
                   - { name: SYNAPSE_TENANT, value: "skirmshop" }
                   - { name: SYNAPSE_EMAIL_SENDER, value: "skirmshop" }
-                  - { name: S3_ENDPOINT, value: "http://skirmshop-drive-s3.backup-hub.svc.cluster.local:9000" }
-                  - { name: S3_BUCKET, value: "skirmshop-drive" }
-                  - { name: S3_REGION, value: "us-east-1" }
-                  - { name: S3_PREFIX, value: "invoices/sii" }
-                  - name: AWS_ACCESS_KEY_ID
-                    valueFrom: { secretKeyRef: { name: skirmshop-drive-s3-sii, key: AWS_ACCESS_KEY_ID } }
-                  - name: AWS_SECRET_ACCESS_KEY
-                    valueFrom: { secretKeyRef: { name: skirmshop-drive-s3-sii, key: AWS_SECRET_ACCESS_KEY } }
+                  # INFRA-1175: fuera S3_*/AWS_* — el código de la app no tiene
+                  # cliente S3 (ni @aws-sdk ni minio en el lockfile, cero lecturas
+                  # de process.env.S3_*/AWS_*): los PDF de factura se generan y se
+                  # sirven en streaming, nunca se suben a un bucket. El MinIO de
+                  # casa se apaga y aquí no había nada que migrar a OVH.
                   - name: SII_CERTIFICATE_PASSPHRASE
                     valueFrom:
                       secretKeyRef: { name: sii-certificate, key: passphrase }
